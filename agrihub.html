@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agri Knowledge Hub — Grow Smarter, Farm Better</title>
+<meta name="description" content="A field guide to modern farming: crops, soils, irrigation, fertilizers, pest management and government schemes.">
+
+<!-- Fonts: Fraunces (organic display serif), Work Sans (body), JetBrains Mono (labels/data) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- Swiper.js -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.0.5/swiper-bundle.min.css">
+
+<style>
+/* ============================================================
+   1. DESIGN TOKENS — the palette, type scale and rhythm that
+      everything else in this file is built from.
+   ============================================================ */
+:root{
+  /* -- Light mode (default): sun-bleached field palette -- */
+  --bg:            #F7F2E4;   /* wheat-chaff cream            */
+  --bg-alt:        #EEE4C8;   /* dried husk, for stripes/cards */
+  --card-bg:       #FFFDF7;
+  --text:          #1E2A18;   /* deep soil-shadow ink          */
+  --text-muted:    #55603F;
+  --forest:        #1F4D2C;   /* primary green                 */
+  --forest-light:  #3C7A4E;
+  --leaf:          #6E9B4E;
+  --gold:          #C99A2E;   /* ripened-grain accent           */
+  --gold-light:    #E4C05C;
+  --soil:          #4A3323;
+  --border:        rgba(30,42,24,0.13);
+  --shadow:        0 20px 50px -20px rgba(30,42,24,0.35);
+  --overlay:       linear-gradient(180deg, rgba(15,25,12,.15), rgba(10,18,8,.75));
+}
+html.dark{
+  /* -- Dark mode: dusk-over-the-field palette -- */
+  --bg:            #0F1A10;
+  --bg-alt:        #16231A;
+  --card-bg:       #172618;
+  --text:          #EFE9D6;
+  --text-muted:    #A7B695;
+  --forest:        #4C8A5C;
+  --forest-light:  #6FAE79;
+  --leaf:          #86B769;
+  --gold:          #E4C05C;
+  --gold-light:    #F0D888;
+  --soil:          #C9A87B;
+  --border:        rgba(239,233,214,0.12);
+  --shadow:        0 20px 50px -20px rgba(0,0,0,0.6);
+  --overlay:       linear-gradient(180deg, rgba(6,10,5,.35), rgba(4,7,4,.88));
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Work Sans', sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  overflow:hidden;
+  transition:background .5s ease, color .5s ease;
+}
+h1,h2,h3,.display{font-family:'Fraunces', serif;}
+.eyebrow{
+  font-family:'JetBrains Mono', monospace;
+  font-size:.72rem;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--gold);
+  display:flex;align-items:center;gap:.6rem;
+}
+.eyebrow::before{content:"";width:26px;height:1.5px;background:var(--gold);display:inline-block;}
+img{max-width:100%;display:block;}
+a{color:inherit;text-decoration:none;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+::selection{background:var(--gold-light);color:#1a1a1a;}
+
+/* Respect reduced motion preference everywhere */
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; scroll-behavior:auto !important;}
+}
+
+/* ============================================================
+   2. ICON SPRITE (inline, reused via <use>) — keeps every card
+      icon crisp, single-color, and theme-aware via currentColor.
+   ============================================================ */
+.icon{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ============================================================
+   3. TOP NAVIGATION
+   ============================================================ */
+.navbar{
+  position:fixed;top:0;left:0;right:0;z-index:500;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.1rem 2.5rem;
+  background:transparent;
+  transition:background .4s ease, box-shadow .4s ease, padding .4s ease;
+}
+.navbar.scrolled{
+  background:color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter:blur(10px);
+  box-shadow:0 1px 0 var(--border);
+  padding:.75rem 2.5rem;
+}
+.brand{display:flex;align-items:center;gap:.6rem;font-family:'Fraunces',serif;font-weight:600;font-size:1.15rem;color:var(--text);}
+.brand .icon{width:26px;height:26px;color:var(--gold);}
+.nav-links{display:flex;gap:.3rem;align-items:center;position:relative;list-style:none;}
+.nav-links button{
+  position:relative;padding:.5rem .9rem;font-size:.88rem;font-weight:500;
+  color:var(--text-muted);letter-spacing:.01em;transition:color .3s ease;
+}
+.nav-links button.active,.nav-links button:hover{color:var(--text);}
+.nav-links button.active::after{
+  content:"";position:absolute;left:.9rem;right:.9rem;bottom:.1rem;height:2px;
+  background:var(--gold);border-radius:2px;
+}
+.nav-right{display:flex;align-items:center;gap:.6rem;}
+.icon-btn{
+  width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  color:var(--text);background:color-mix(in srgb, var(--bg-alt) 80%, transparent);
+  border:1px solid var(--border);transition:transform .3s ease, background .3s ease;
+}
+.icon-btn:hover{transform:translateY(-2px) rotate(-8deg);background:var(--bg-alt);}
+.icon-btn .icon{width:18px;height:18px;}
+.hamburger{display:none;}
+
+/* ============================================================
+   4. SWIPER STRUCTURE — 8 full-screen vertical slides
+   ============================================================ */
+.mySwiper{width:100%;height:100vh;}
+.swiper-slide{
+  position:relative;width:100%;height:100%;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+.slide-inner{
+  position:relative;z-index:3;width:100%;max-width:1180px;
+  padding:7.5rem 2.5rem 4rem;
+}
+.slide-bg{
+  position:absolute;inset:-6%;z-index:0;
+  background-size:cover;background-position:center;
+  will-change:transform;
+}
+.slide-bg::after{content:"";position:absolute;inset:0;background:var(--overlay);}
+.slide-bg.light-overlay::after{background:linear-gradient(180deg, rgba(247,242,228,.55), rgba(247,242,228,.94));}
+html.dark .slide-bg.light-overlay::after{background:linear-gradient(180deg, rgba(15,26,16,.6), rgba(15,26,16,.95));}
+
+/* ---------- Reveal animations, staggered per card ---------- */
+.reveal{opacity:0;transform:translateY(26px);transition:none;}
+.swiper-slide-active .reveal{
+  animation:revealUp .75s cubic-bezier(.22,.9,.3,1) forwards;
+  animation-delay:calc(var(--i, 0) * 90ms);
+}
+@keyframes revealUp{to{opacity:1;transform:translateY(0);}}
+@keyframes floatY{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+@keyframes drift{0%{background-position:0 0;}100%{background-position:120px 60px;}}
+
+/* ============================================================
+   5. HERO SLIDE
+   ============================================================ */
+.hero-slide .slide-inner{max-width:900px;text-align:center;margin:0 auto;padding-top:0;}
+.hero-eyebrow{justify-content:center;color:var(--gold-light);}
+.hero-eyebrow::before{background:var(--gold-light);}
+.hero h1{
+  font-size:clamp(2.6rem, 6.5vw, 5.2rem);
+  line-height:1.02;color:#FBF6E7;font-weight:600;
+  margin:1.1rem 0 1.4rem;letter-spacing:-.01em;
+}
+.hero h1 .word{display:inline-block;overflow:hidden;vertical-align:top;}
+.hero h1 .word span{display:inline-block;transform:translateY(110%);animation:wordUp .8s cubic-bezier(.22,.9,.3,1) forwards;}
+@keyframes wordUp{to{transform:translateY(0);}}
+.hero h1 em{font-style:italic;color:var(--gold-light);}
+.hero p.lede{
+  font-size:1.15rem;color:#EFE9D6;max-width:560px;margin:0 auto 2.2rem;
+  line-height:1.65;
+}
+.hero-ctas{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
+.btn{
+  display:inline-flex;align-items:center;gap:.55rem;
+  padding:.95rem 1.9rem;border-radius:100px;font-weight:600;font-size:.95rem;
+  transition:transform .3s ease, box-shadow .3s ease, background .3s ease, color .3s ease;
+}
+.btn-primary{background:var(--gold);color:#20200F;box-shadow:0 10px 30px -10px rgba(201,154,46,.6);}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 16px 34px -12px rgba(201,154,46,.75);}
+.btn-outline{border:1.4px solid rgba(255,255,255,.55);color:#FBF6E7;}
+.btn-outline:hover{background:rgba(255,255,255,.12);transform:translateY(-3px);}
+.hero-scroll-hint{
+  position:absolute;bottom:2.4rem;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:.4rem;
+  color:#EFE9D6;font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.14em;
+  z-index:3;
+}
+.hero-scroll-hint .icon{animation:floatY 1.8s ease-in-out infinite;width:16px;height:16px;}
+
+/* ============================================================
+   6. SECTION HEADER (shared by content slides)
+   ============================================================ */
+.section-header{max-width:640px;margin-bottom:2.6rem;}
+.section-header h2{font-size:clamp(1.9rem,3.4vw,2.7rem);font-weight:600;margin:.6rem 0 .8rem;color:var(--text);}
+.section-header p{color:var(--text-muted);font-size:1.02rem;line-height:1.65;}
+
+/* ============================================================
+   7. CARD GRID — used across crops/soil/irrigation/fertilizer/pest
+   ============================================================ */
+.cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.1rem;}
+.card{
+  position:relative;background:var(--card-bg);border:1px solid var(--border);
+  border-radius:18px;padding:1.5rem 1.4rem 1.6rem;overflow:hidden;
+  transition:transform .4s cubic-bezier(.22,.9,.3,1), box-shadow .4s ease, border-color .4s ease;
+}
+.card::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--forest-light),var(--gold));
+  transform:scaleX(0);transform-origin:left;transition:transform .45s ease;
+}
+.card:hover{transform:translateY(-8px);box-shadow:var(--shadow);border-color:transparent;}
+.card:hover::before{transform:scaleX(1);}
+.card-icon{
+  width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+  background:color-mix(in srgb, var(--forest-light) 16%, transparent);color:var(--forest-light);
+  margin-bottom:1rem;transition:transform .4s ease, background .4s ease;
+}
+.card:hover .card-icon{transform:scale(1.08) rotate(-6deg);background:color-mix(in srgb, var(--gold) 22%, transparent);color:var(--gold);}
+.card-icon .icon{width:22px;height:22px;}
+.card h3{font-size:1.08rem;font-weight:600;margin-bottom:.45rem;font-family:'Work Sans',sans-serif;}
+.card p{font-size:.89rem;color:var(--text-muted);line-height:1.55;}
+.card .tag{
+  display:inline-block;margin-top:.85rem;font-family:'JetBrains Mono',monospace;font-size:.68rem;
+  letter-spacing:.06em;color:var(--forest-light);background:color-mix(in srgb, var(--forest-light) 14%, transparent);
+  padding:.25rem .55rem;border-radius:100px;
+}
+
+/* ============================================================
+   8. GROWTH-STAGE NAVIGATOR — the page's signature element.
+      A vertical rail of 8 icons tracing a crop's life cycle
+      (seed \u2192 harvest basket) that doubles as slide pagination.
+   ============================================================ */
+.growth-nav{
+  position:fixed;right:1.6rem;top:50%;transform:translateY(-50%);z-index:400;
+  display:flex;flex-direction:column;align-items:center;gap:.35rem;
+}
+.growth-nav .rail-line{
+  position:absolute;left:50%;top:22px;bottom:22px;width:2px;transform:translateX(-50%);
+  background:linear-gradient(var(--border),var(--border));z-index:-1;
+}
+.growth-dot{
+  position:relative;width:34px;height:34px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--card-bg);border:1.5px solid var(--border);color:var(--text-muted);
+  transition:all .4s cubic-bezier(.22,.9,.3,1);
+}
+.growth-dot .icon{width:15px;height:15px;}
+.growth-dot::after{
+  content:attr(data-label);position:absolute;right:46px;top:50%;transform:translateY(-50%) translateX(6px);
+  font-family:'JetBrains Mono',monospace;font-size:.66rem;letter-spacing:.05em;white-space:nowrap;
+  background:var(--card-bg);border:1px solid var(--border);padding:.3rem .6rem;border-radius:6px;
+  opacity:0;pointer-events:none;transition:opacity .25s ease, transform .25s ease;color:var(--text);
+}
+.growth-dot:hover::after{opacity:1;transform:translateY(-50%) translateX(0);}
+.growth-dot:hover{border-color:var(--gold);color:var(--gold);}
+.growth-dot.active{
+  background:var(--gold);border-color:var(--gold);color:#20200F;
+  width:40px;height:40px;box-shadow:0 0 0 5px color-mix(in srgb, var(--gold) 22%, transparent);
+  animation:growPulse 2.4s ease-in-out infinite;
+}
+@keyframes growPulse{0%,100%{box-shadow:0 0 0 5px color-mix(in srgb, var(--gold) 22%, transparent);}50%{box-shadow:0 0 0 9px color-mix(in srgb, var(--gold) 10%, transparent);}}
+
+/* ============================================================
+   9. SCHEMES SLIDE (government schemes — list-style cards)
+   ============================================================ */
+.scheme-list{display:flex;flex-direction:column;gap:.85rem;}
+.scheme-row{
+  display:grid;grid-template-columns:auto 1fr auto;gap:1.3rem;align-items:center;
+  background:var(--card-bg);border:1px solid var(--border);border-radius:16px;
+  padding:1.15rem 1.4rem;transition:transform .35s ease, box-shadow .35s ease, border-color .35s ease;
+}
+.scheme-row:hover{transform:translateX(6px);box-shadow:var(--shadow);border-color:transparent;}
+.scheme-row .card-icon{margin:0;flex-shrink:0;}
+.scheme-row h3{font-size:1rem;font-weight:600;margin-bottom:.2rem;}
+.scheme-row p{font-size:.86rem;color:var(--text-muted);line-height:1.5;}
+.scheme-row .scheme-code{
+  font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--gold);
+  border:1px solid color-mix(in srgb, var(--gold) 40%, transparent);padding:.35rem .7rem;border-radius:100px;
+  white-space:nowrap;
+}
+
+/* ============================================================
+   10. CONTACT SLIDE
+   ============================================================ */
+.contact-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:2.6rem;align-items:start;}
+.contact-info-row{display:flex;gap:1rem;align-items:flex-start;margin-bottom:1.3rem;}
+.contact-info-row .card-icon{margin:0;flex-shrink:0;width:42px;height:42px;}
+.contact-info-row h4{font-size:.95rem;font-weight:600;margin-bottom:.2rem;}
+.contact-info-row p{font-size:.87rem;color:var(--text-muted);}
+.form-box{background:var(--card-bg);border:1px solid var(--border);border-radius:20px;padding:1.8rem;}
+.field{margin-bottom:1rem;}
+.field label{display:block;font-size:.78rem;font-family:'JetBrains Mono',monospace;color:var(--text-muted);margin-bottom:.4rem;letter-spacing:.03em;}
+.field input,.field textarea{
+  width:100%;padding:.75rem .9rem;border-radius:10px;border:1.4px solid var(--border);
+  background:var(--bg);color:var(--text);font-family:'Work Sans',sans-serif;font-size:.92rem;
+  transition:border-color .3s ease, box-shadow .3s ease;
+}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px color-mix(in srgb, var(--gold) 20%, transparent);}
+.field textarea{resize:vertical;min-height:90px;}
+.footer-mini{
+  margin-top:2.2rem;padding-top:1.4rem;border-top:1px solid var(--border);
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;
+  font-size:.8rem;color:var(--text-muted);
+}
+.footer-mini .socials{display:flex;gap:.6rem;}
+.footer-mini .socials a{
+  width:32px;height:32px;border-radius:50%;border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;transition:all .3s ease;
+}
+.footer-mini .socials a:hover{background:var(--gold);color:#20200F;border-color:var(--gold);transform:translateY(-3px);}
+.footer-mini .socials .icon{width:14px;height:14px;}
+
+/* ============================================================
+   11. RESPONSIVE
+   ============================================================ */
+@media (max-width:1024px){
+  .cards-grid{grid-template-columns:repeat(2,1fr);}
+  .contact-grid{grid-template-columns:1fr;}
+}
+@media (max-width:760px){
+  .navbar{padding:1rem 1.2rem;}
+  .nav-links{
+    position:fixed;inset:0 0 0 auto;width:74%;height:100vh;background:var(--bg);
+    flex-direction:column;justify-content:center;gap:.4rem;
+    transform:translateX(100%);transition:transform .45s cubic-bezier(.22,.9,.3,1);
+    box-shadow:-10px 0 40px rgba(0,0,0,.25);
+  }
+  .nav-links.open{transform:translateX(0);}
+  .nav-links button{width:100%;text-align:left;font-size:1.05rem;padding:.85rem 1.6rem;}
+  .hamburger{display:flex;}
+  .cards-grid{grid-template-columns:1fr;}
+  .slide-inner{padding:6.5rem 1.3rem 3rem;}
+  .growth-nav{right:.5rem;gap:.22rem;}
+  .growth-dot{width:28px;height:28px;}
+  .growth-dot.active{width:32px;height:32px;}
+  .growth-dot::after{display:none;}
+  .scheme-row{grid-template-columns:auto 1fr;}
+  .scheme-row .scheme-code{grid-column:2;justify-self:start;}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     ICON SPRITE — single source of truth for every icon on the page
+     ============================================================ -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M4 20c8-1 15-6 16-16C10 5 5 11 4 20Z"/><path d="M5 19c3-4 6-6 12-9"/></symbol>
+    <symbol id="i-wheat" viewBox="0 0 24 24"><path d="M12 2v20"/><path d="M12 5c2 1 3 0 4-1M12 5c-2 1-3 0-4-1M12 9c2 1 3 0 4-1M12 9c-2 1-3 0-4-1M12 13c2 1 3 0 4-1M12 13c-2 1-3 0-4-1"/></symbol>
+    <symbol id="i-seed" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="6" ry="9" transform="rotate(45 12 12)"/><path d="M12 12c0-4 2-7 5-9"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></symbol>
+    <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 2s7 8.5 7 13a7 7 0 1 1-14 0c0-4.5 7-13 7-13Z"/></symbol>
+    <symbol id="i-shower" viewBox="0 0 24 24"><path d="M4 9h16M6 9V6a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3v3"/><path d="M8 14v3M12 14v4M16 14v3"/></symbol>
+    <symbol id="i-waves" viewBox="0 0 24 24"><path d="M2 8c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><path d="M2 14c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><path d="M2 20c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/></symbol>
+    <symbol id="i-pipe" viewBox="0 0 24 24"><path d="M3 12h9a4 4 0 0 0 4-4V5"/><circle cx="18" cy="4" r="1.6"/><path d="M9 12v7"/><circle cx="9" cy="20.5" r="1.6"/></symbol>
+    <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6L4.5 19a2 2 0 0 0 1.8 3h11.4a2 2 0 0 0 1.8-3L14 9V3"/><path d="M7.5 15h9"/></symbol>
+    <symbol id="i-recycle" viewBox="0 0 24 24"><path d="M7 8 4 13l3 5"/><path d="M17 8h-6l-2 3"/><path d="M20 16l-3 5-3-5"/><path d="M8 21h9"/><path d="M6 3h6l3 5"/></symbol>
+    <symbol id="i-flask2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-bug" viewBox="0 0 24 24"><ellipse cx="12" cy="13" rx="5" ry="7"/><path d="M12 6V3M9 6 7 3M15 6l2-3M4 12H2M22 12h-2M4 17l-2 2M22 17l-2 2M7 20l-1.5 2M17 20l1.5 2"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.4 8.7 8 11 4.6-2.3 8-6 8-11V5l-8-3Z"/><path d="M9 12l2 2 4-4"/></symbol>
+    <symbol id="i-trap" viewBox="0 0 24 24"><rect x="5" y="9" width="14" height="10" rx="2"/><path d="M8 9V6a4 4 0 0 1 8 0v3"/></symbol>
+    <symbol id="i-spray" viewBox="0 0 24 24"><path d="M6 22V10a4 4 0 0 1 4-4h1V4h2v2h1a4 4 0 0 1 4 4v12Z"/><path d="M3 13h1M3 16h2M3 10h1"/></symbol>
+    <symbol id="i-bank" viewBox="0 0 24 24"><path d="M3 10 12 4l9 6"/><path d="M5 10v9M9 10v9M15 10v9M19 10v9"/><path d="M3 21h18"/></symbol>
+    <symbol id="i-card" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19"/><path d="M6 15h4"/></symbol>
+    <symbol id="i-umbrella" viewBox="0 0 24 24"><path d="M2 11a10 10 0 0 1 20 0Z"/><path d="M12 11v8a2 2 0 0 1-4 0"/><path d="M12 2v2"/></symbol>
+    <symbol id="i-market" viewBox="0 0 24 24"><path d="M3 9l1.5-5h15L21 9"/><path d="M4 9v10h16V9"/><path d="M9 19v-5a3 3 0 0 1 6 0v5"/></symbol>
+    <symbol id="i-basket" viewBox="0 0 24 24"><path d="M4 10h16l-1.5 10a2 2 0 0 1-2 1.8H7.5a2 2 0 0 1-2-1.8Z"/><path d="M8 10 12 3l4 7"/><path d="M9 14v4M15 14v4"/></symbol>
+    <symbol id="i-sprout" viewBox="0 0 24 24"><path d="M12 21V11"/><path d="M12 12c0-4 3-6 7-6 0 4-2 7-7 6Z"/><path d="M12 13c0-3-2.5-5-6-5 0 3.4 2.2 5.6 6 5Z"/></symbol>
+    <symbol id="i-tree" viewBox="0 0 24 24"><path d="M12 22v-6"/><path d="M12 3c4 0 6 3 6 6 0 4-3 5-6 5s-6-1-6-5c0-3 2-6 6-6Z"/></symbol>
+    <symbol id="i-flower" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.4"/><circle cx="12" cy="6" r="2.6"/><circle cx="12" cy="18" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="12" r="2.6"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 22s7-7.4 7-12.6A7 7 0 0 0 5 9.4C5 14.6 12 22 12 22Z"/><circle cx="12" cy="9.4" r="2.3"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2.2 2C10 20.5 3.5 14 3 6.2A2 2 0 0 1 5 4Z"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M3 6.5 12 13l9-6.5"/></symbol>
+    <symbol id="i-arrow-down" viewBox="0 0 24 24"><path d="M12 4v16M6 14l6 6 6-6"/></symbol>
+    <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M4 12h16M14 6l6 6-6 6"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z"/></symbol>
+    <symbol id="i-sun-toggle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+    <symbol id="i-insta" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.4" cy="6.6" r="1"/></symbol>
+    <symbol id="i-twitter" viewBox="0 0 24 24"><path d="M21 5.3c-.8.4-1.6.6-2.5.8a4.3 4.3 0 0 0-7.4 3.9A12.2 12.2 0 0 1 2.3 4.9a4.3 4.3 0 0 0 1.3 5.7c-.7 0-1.4-.2-2-.5 0 2.1 1.5 3.9 3.5 4.3-.6.2-1.3.2-1.9.1.5 1.7 2.1 2.9 4 3A8.6 8.6 0 0 1 2 19.4a12.2 12.2 0 0 0 6.6 1.9c7.9 0 12.2-6.5 12.2-12.2v-.6c.8-.6 1.6-1.4 2.2-2.2Z"/></symbol>
+    <symbol id="i-yt" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="3"/><path d="M10.5 9.5 15 12l-4.5 2.5Z"/></symbol>
+  </defs>
+</svg>
+
+<!-- ============================================================
+     NAVIGATION
+     ============================================================ -->
+<nav class="navbar" id="navbar">
+  <a href="#" class="brand" data-goto="0"><svg class="icon"><use href="#i-leaf"/></svg> Agri Knowledge Hub</a>
+
+  <ul class="nav-links" id="navLinks">
+    <li><button data-goto="0" class="active">Home</button></li>
+    <li><button data-goto="1">Crops</button></li>
+    <li><button data-goto="2">Soil</button></li>
+    <li><button data-goto="3">Irrigation</button></li>
+    <li><button data-goto="4">Fertilizers</button></li>
+    <li><button data-goto="5">Pest Control</button></li>
+    <li><button data-goto="6">Schemes</button></li>
+    <li><button data-goto="7">Contact</button></li>
+  </ul>
+
+  <div class="nav-right">
+    <button class="icon-btn" id="themeToggle" aria-label="Toggle dark mode">
+      <svg class="icon" id="themeIcon"><use href="#i-moon"/></svg>
+    </button>
+    <button class="icon-btn hamburger" id="hamburger" aria-label="Open menu">
+      <svg class="icon"><use href="#i-menu"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- ============================================================
+     GROWTH-STAGE NAVIGATOR (signature element / custom pagination)
+     ============================================================ -->
+<div class="growth-nav" id="growthNav">
+  <div class="rail-line"></div>
+  <button class="growth-dot" data-goto="0" data-label="Home"><svg class="icon"><use href="#i-seed"/></svg></button>
+  <button class="growth-dot" data-goto="1" data-label="Crops"><svg class="icon"><use href="#i-sprout"/></svg></button>
+  <button class="growth-dot" data-goto="2" data-label="Soil"><svg class="icon"><use href="#i-leaf"/></svg></button>
+  <button class="growth-dot" data-goto="3" data-label="Irrigation"><svg class="icon"><use href="#i-drop"/></svg></button>
+  <button class="growth-dot" data-goto="4" data-label="Fertilizers"><svg class="icon"><use href="#i-flask"/></svg></button>
+  <button class="growth-dot" data-goto="5" data-label="Pest Control"><svg class="icon"><use href="#i-shield"/></svg></button>
+  <button class="growth-dot" data-goto="6" data-label="Schemes"><svg class="icon"><use href="#i-bank"/></svg></button>
+  <button class="growth-dot" data-goto="7" data-label="Contact"><svg class="icon"><use href="#i-basket"/></svg></button>
+</div>
+
+<!-- ============================================================
+     SWIPER — 8 full-screen slides
+     ============================================================ -->
+<div class="swiper mySwiper">
+  <div class="swiper-wrapper">
+
+    <!-- ============ SLIDE 1 : HERO ============ -->
+    <div class="swiper-slide hero-slide">
+      <div class="slide-bg" data-swiper-parallax="-22%" style="background-image:url('https://images.unsplash.com/photo-1500937386664-56d1dfef3854?q=80&w=1920&auto=format&fit=crop')"></div>
+      <div class="slide-inner">
+        <div class="eyebrow hero-eyebrow reveal" style="--i:0">Est. for growers, students &amp; agronomists</div>
+        <h1 class="reveal" style="--i:1">
+          <span class="word"><span>Cultivate</span></span> <span class="word"><span>knowledge.</span></span><br>
+          <span class="word"><span>Harvest</span></span> <span class="word"><span><em>the future.</em></span></span>
+        </h1>
+        <p class="lede reveal" style="--i:2">A field guide to modern agriculture — crops, soils, irrigation, fertilizers, pest management and the government schemes that support every farmer's journey.</p>
+        <div class="hero-ctas reveal" style="--i:3">
+          <button class="btn btn-primary" data-goto="1">Get Started <svg class="icon"><use href="#i-arrow-right"/></svg></button>
+          <button class="btn btn-outline" data-goto="7">Contact Us</button>
+        </div>
+      </div>
+      <div class="hero-scroll-hint"><span>SCROLL</span><svg class="icon"><use href="#i-arrow-down"/></svg></div>
+    </div>
+
+    <!-- ============ SLIDE 2 : CROP TYPES ============ -->
+    <div class="swiper-slide">
+      <div class="slide-bg light-overlay" data-swiper-parallax="-16%" style="background-image:url('https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?q=80&w=1920&auto=format&fit=crop')"></div>
+      <div class="slide-inner">
+        <div class="eyebrow reveal" style="--i:0">01 — Field Guide</div>
+        <div class="section-header reveal" style="--i:1">
+          <h2>Crop Types</h2>
+          <p>From staple grains to high-value cash crops, every crop family asks something different of the soil, season and farmer.</p>
+        </div>
+        <div class="cards-grid">
+          <div class="card reveal" style="--i:2"><div class="card-icon"><svg class="icon"><use href="#i-wheat"/></svg></div><h3>Cereals</h3><p>Rice, wheat, maize and millets — the backbone of food security, grown across nearly every agro-climatic zone.</p><span class="tag">Staple grain</span></div>
+          <div class="card reveal" style="--i:3"><div class="card-icon"><svg class="icon"><use href="#i-seed"/></svg></div><h3>Pulses</h3><p>Lentils, chickpeas and gram fix nitrogen in the soil while supplying most of the world's plant protein.</p><span class="tag">Nitrogen-fixing</span></div>
+          <div class="card reveal" style="--i:4"><div class="card-icon"><svg class="icon"><use href="#i-sun"/></svg></div><h3>Oilseeds</h3><p>Groundnut, mustard and soybean are pressed for cooking oil and processed into protein-rich cattle feed.</p><span class="tag">Rabi &amp; Kharif</span></div>
+          <div class="card reveal" style="--i:5"><div class="card-icon"><svg class="icon"><use href="#i-leaf"/></svg></div><h3>Cash Crops</h3><p>Cotton, sugarcane and jute are grown primarily for sale and export rather than on-farm consumption.</p><span class="tag">Commercial</span></div>
+          <div class="card reveal" style="--i:6"><div class="card-icon"><svg class="icon"><use href="#i-tree"/></svg></div><h3>Fruits</h3><p>Mango, banana and citrus orchards need long-term investment but return steady, high-value harvests.</p><span class="tag">Horticulture</span></div>
+          <div class="card reveal" style="--i:7"><div class="card-icon"><svg class="icon"><use href="#i-sprout"/></svg></div><h3>Vegetables</h3><p>Tomato, onion and leafy greens are short-duration crops that keep cash flowing between main seasons.</p><span class="tag">Short duration</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ SLIDE 3 : SOIL CLASSIFICATION ============ -->
+    <div class="swiper-slide">
+      <div class="slide-bg light-overlay" data-swiper-parallax="-16%" style="background-image:url('https://images.unsplash.com/photo-1416879595882-3373a0480b5b?q=80&w=1920&auto=format&fit=crop')"></div>
+      <div class="slide-inner">
+        <div class="eyebrow reveal" style="--i:0">02 — Beneath Your Feet</div>
+        <div class="section-header reveal" style="--i:1">
+          <h2>Soil Classification</h2>
+          <p>Soil is the first input any farmer works with. Knowing its type shapes every decision that follows — from crop choice to fertilizer dose.</p>
+        </div>
+        <div class="cards-grid">
+          <div class="card reveal" style="--i:2"><div class="card-icon"><svg class="icon"><use href="#i-waves"/></svg></div><h3>Alluvial Soil</h3><p>Deposited by rivers, rich in potash and lime — the most fertile soil, ideal for cereals and sugarcane.</p><span class="tag">River plains</span></div>
+          <div class="card reveal" style="--i:3"><div class="card-icon"><svg class="icon"><use href="#i-drop"/></svg></div><h3>Black (Regur) Soil</h3><p>High clay content retains moisture well, making it the classic choice for cotton and oilseed cultivation.</p><span class="tag">Cotton belt</span></div>
+          <div class="card reveal" style="--i:4"><div class="card-icon"><svg class="icon"><use href="#i-sun"/></svg></div><h3>Red &amp; Yellow Soil</h3><p>Iron-rich and porous; responds well to irrigation and organic matter for pulses, millets and groundnut.</p><span class="tag">Iron-rich</span></div>
+          <div class="card reveal" style="--i:5"><div class="card-icon"><svg class="icon"><use href="#i-flower"/></svg></div><h3>Laterite Soil</h3><p>Formed under heavy rainfall and leaching; needs lime and manure but suits cashew, tea and coffee.</p><span class="tag">Plantation</span></div>
+          <div class="card reveal" style="--i:6"><div class="card-icon"><svg class="icon"><use href="#i-sun-toggle"/></svg></div><h3>Arid &amp; Desert Soil</h3><p>Sandy, low in organic matter and moisture — needs drip irrigation and drought-hardy crop varieties.</p><span class="tag">Low rainfall</span></div>
+          <div class="card reveal" style="--i:7"><div class="card-icon"><svg class="icon"><use href="#i-tree"/></svg></div><h3>Mountain &amp; Forest Soil</h3><p>Thin, humus-rich topsoil found on slopes; supports tea, spices and terraced horticulture.</p><span class="tag">Terraced</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ SLIDE 4 : IRRIGATION TECHNIQUES ============ -->
+    <div class="swiper-slide">
+      <div class="slide-bg light-overlay" data-swiper-parallax="-16%" style="background-image:url('https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?q=80&w=1920&auto=format&fit=crop')"></div>
+      <div class="slide-inner">
+        <div class="eyebrow reveal" style="--i:0">03 — Water Management</div>
+        <div class="section-header reveal" style="--i:1">
+          <h2>Irrigation Techniques</h2>
+          <p>Getting water to the root zone efficiently is often the biggest lever on yield — and on the water bill.</p>
+        </div>
+        <div class="cards-grid">
+          <div class="card reveal" style="--i:2"><div class="card-icon"><svg class="icon"><use href="#i-drop"/></svg></div><h3>Drip Irrigation</h3><p>Delivers water directly to the root zone drop by drop, cutting water use by up to 60% versus flooding.</p><span class="tag">Water-efficient</span></div>
+          <div class="card reveal" style="--i:3"><div class="card-icon"><svg class="icon"><use href="#i-shower"/></svg></div><h3>Sprinkler Irrigation</h3><p>Mimics rainfall through overhead nozzles — well suited to undulating land and closely spaced crops.</p><span class="tag">Uniform coverage</span></div>
+          <div class="card reveal" style="--i:4"><div class="card-icon"><svg class="icon"><use href="#i-waves"/></svg></div><h3>Flood Irrigation</h3><p>The traditional method of letting water spread freely across a field — low-cost but water-intensive.</p><span class="tag">Low-cost</span></div>
+          <div class="card reveal" style="--i:5"><div class="card-icon"><svg class="icon"><use href="#i-pipe"/></svg></div><h3>Furrow Irrigation</h3><p>Water runs through narrow channels between crop rows, keeping foliage dry and reducing disease risk.</p><span class="tag">Row crops</span></div>
+          <div class="card reveal" style="--i:6"><div class="card-icon"><svg class="icon"><use href="#i-flask2"/></svg></div><h3>Subsurface Irrigation</h3><p>Buried pipes feed water below the surface directly to roots, minimising evaporation loss entirely.</p><span class="tag">Minimal loss</span></div>
+          <div class="card reveal" style="--i:7"><div class="card-icon"><svg class="icon"><use href="#i-umbrella"/></svg></div><h3>Rainwater Harvesting</h3><p>Farm ponds and check dams capture monsoon runoff, building a water reserve for the dry season ahead.</p><span class="tag">Monsoon capture</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ SLIDE 5 : FERTILIZERS ============ -->
+    <div class="swiper-slide">
+      <div class="slide-bg light-overlay" data-swiper-parallax="-16%" style="background-image:url('https://images.unsplash.com/photo-1592982537447-7440770cbfc9?q=80&w=1920&auto=format&fit=crop')"></div>
+      <div class="slide-inner">
+        <div class="eyebrow reveal" style="--i:0">04 — Feeding the Soil</div>
+        <div class="section-header reveal" style="--i:1">
+          <h2>Fertilizers &amp; Nutrients</h2>
+          <p>Balanced nutrition — not maximum quantity — is what turns healthy soil into a healthy harvest.</p>
+        </div>
+        <div class="cards-grid">
+          <div class="card reveal" style="--i:2"><div class="card-icon"><svg class="icon"><use href="#i-leaf"/></svg></div><h3>Nitrogen (N)</h3><p>Drives leafy, vegetative growth and chlorophyll production — the nutrient crops need in the largest amount.</p><span class="tag">Vegetative growth</span></div>
+          <div class="card reveal" style="--i:3"><div class="card-icon"><svg class="icon"><use href="#i-flower"/></svg></div><h3>Phosphorus (P)</h3><p>Strengthens root development and speeds up flowering, fruiting and overall energy transfer in the plant.</p><span class="tag">Root &amp; flower</span></div>
+          <div class="card reveal" style="--i:4"><div class="card-icon"><svg class="icon"><use href="#i-shield"/></svg></div><h3>Potassium (K)</h3><p>Improves disease resistance, water regulation and grain quality — often called the "quality nutrient".</p><span class="tag">Disease resistance</span></div>
+          <div class="card reveal" style="--i:5"><div class="card-icon"><svg class="icon"><use href="#i-recycle"/></svg></div><h3>Organic &amp; Compost</h3><p>Farmyard manure, vermicompost and green manure rebuild soil structure and long-term fertility.</p><span class="tag">Soil health</span></div>
+          <div class="card reveal" style="--i:6"><div class="card-icon"><svg class="icon"><use href="#i-flask"/></svg></div><h3>Biofertilizers</h3><p>Living microbial cultures like Rhizobium and Azotobacter fix nutrients naturally, cutting chemical dependence.</p><span class="tag">Microbial</span></div>
+          <div class="card reveal" style="--i:7"><div class="card-icon"><svg class="icon"><use href="#i-sun"/></svg></div><h3>Micronutrients</h3><p>Zinc, boron and iron are needed in tiny amounts but their absence quietly caps every other input's return.</p><span class="tag">Trace elements</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ SLIDE 6 : PEST MANAGEMENT ============ -->
+    <div class="swiper-slide">
+      <div class="slide-bg light-overlay" data-swiper-parallax="-16%" style="background-image:url('https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=80&w=1920&auto=format&fit=crop')"></div>
+      <div class="slide-inner">
+        <div class="eyebrow reveal" style="--i:0">05 — Crop Protection</div>
+        <div class="section-header reveal" style="--i:1">
+          <h2>Pest Management</h2>
+          <p>The best pest strategy blends prevention, biology and chemistry — reaching for the sprayer last, not first.</p>
+        </div>
+        <div class="cards-grid">
+          <div class="card reveal" style="--i:2"><div class="card-icon"><svg class="icon"><use href="#i-shield"/></svg></div><h3>Integrated Pest Management</h3><p>Combines monitoring, thresholds and multiple tactics to keep pests in check with minimal chemical input.</p><span class="tag">IPM</span></div>
+          <div class="card reveal" style="--i:3"><div class="card-icon"><svg class="icon"><use href="#i-bug"/></svg></div><h3>Biological Control</h3><p>Natural predators like ladybirds and parasitic wasps keep pest populations down without any spraying.</p><span class="tag">Natural predators</span></div>
+          <div class="card reveal" style="--i:4"><div class="card-icon"><svg class="icon"><use href="#i-spray"/></svg></div><h3>Chemical Control</h3><p>Targeted pesticides used at the right dose and stage — a fast fix reserved for real outbreaks.</p><span class="tag">Targeted use</span></div>
+          <div class="card reveal" style="--i:5"><div class="card-icon"><svg class="icon"><use href="#i-sprout"/></svg></div><h3>Cultural Practices</h3><p>Crop rotation, timed sowing and field sanitation break pest life cycles before they ever take hold.</p><span class="tag">Prevention</span></div>
+          <div class="card reveal" style="--i:6"><div class="card-icon"><svg class="icon"><use href="#i-leaf"/></svg></div><h3>Botanical Pesticides</h3><p>Neem and pyrethrum extracts offer effective, biodegradable protection with low toxicity to humans.</p><span class="tag">Bio-pesticide</span></div>
+          <div class="card reveal" style="--i:7"><div class="card-icon"><svg class="icon"><use href="#i-trap"/></svg></div><h3>Pheromone Traps</h3><p>Scent lures draw in and trap specific insect species, useful for both monitoring and mass control.</p><span class="tag">Monitoring</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ SLIDE 7 : GOVERNMENT SCHEMES ============ -->
+    <div class="swiper-slide">
+      <div class="slide-bg light-overlay" data-swiper-parallax="-16%" style="background-image:url('https://images.unsplash.com/photo-1591192533531-9a9fdc0d9c9e?q=80&w=1920&auto=format&fit=crop')"></div>
+      <div class="slide-inner">
+        <div class="eyebrow reveal" style="--i:0">06 — Support Systems</div>
+        <div class="section-header reveal" style="--i:1">
+          <h2>Government Agricultural Schemes</h2>
+          <p>Key national programmes that provide income support, insurance, credit and infrastructure to farmers.</p>
+        </div>
+        <div class="scheme-list">
+          <div class="scheme-row reveal" style="--i:2"><div class="card-icon"><svg class="icon"><use href="#i-bank"/></svg></div><div><h3>PM-KISAN</h3><p>Direct income support of ₹6,000 per year to eligible farmer families, paid in three instalments.</p></div><span class="scheme-code">Income Support</span></div>
+          <div class="scheme-row reveal" style="--i:3"><div class="card-icon"><svg class="icon"><use href="#i-umbrella"/></svg></div><div><h3>PM Fasal Bima Yojana</h3><p>Low-premium crop insurance protecting farmers against yield loss from natural calamities and pests.</p></div><span class="scheme-code">PMFBY</span></div>
+          <div class="scheme-row reveal" style="--i:4"><div class="card-icon"><svg class="icon"><use href="#i-flask2"/></svg></div><div><h3>Soil Health Card Scheme</h3><p>Free periodic soil testing that recommends the right nutrient dose for every individual farm plot.</p></div><span class="scheme-code">Soil Testing</span></div>
+          <div class="scheme-row reveal" style="--i:5"><div class="card-icon"><svg class="icon"><use href="#i-card"/></svg></div><div><h3>Kisan Credit Card</h3><p>Affordable, flexible credit for seeds, fertilizer and equipment at concessional interest rates.</p></div><span class="scheme-code">KCC</span></div>
+          <div class="scheme-row reveal" style="--i:6"><div class="card-icon"><svg class="icon"><use href="#i-drop"/></svg></div><div><h3>PM Krishi Sinchayee Yojana</h3><p>Expands irrigation coverage and promotes efficient, on-farm water use through modern methods.</p></div><span class="scheme-code">PMKSY</span></div>
+          <div class="scheme-row reveal" style="--i:7"><div class="card-icon"><svg class="icon"><use href="#i-market"/></svg></div><div><h3>e-NAM</h3><p>An online trading platform connecting mandis nationwide, giving farmers fairer price discovery.</p></div><span class="scheme-code">Digital Market</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ SLIDE 8 : CONTACT ============ -->
+    <div class="swiper-slide">
+      <div class="slide-bg light-overlay" data-swiper-parallax="-16%" style="background-image:url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1920&auto=format&fit=crop')"></div>
+      <div class="slide-inner">
+        <div class="eyebrow reveal" style="--i:0">07 — Get In Touch</div>
+        <div class="section-header reveal" style="--i:1">
+          <h2>Contact Us</h2>
+          <p>Questions about a scheme, a crop plan, or want to contribute your own field notes? We'd love to hear from you.</p>
+        </div>
+
+        <div class="contact-grid">
+          <div class="reveal" style="--i:2">
+            <div class="contact-info-row">
+              <div class="card-icon"><svg class="icon"><use href="#i-pin"/></svg></div>
+              <div><h4>Visit</h4><p>Krishi Bhavan, Agri Extension Road, Coimbatore, Tamil Nadu 641003</p></div>
+            </div>
+            <div class="contact-info-row">
+              <div class="card-icon"><svg class="icon"><use href="#i-phone"/></svg></div>
+              <div><h4>Call</h4><p>+91 98765 43210 (Mon–Sat, 9am–6pm)</p></div>
+            </div>
+            <div class="contact-info-row">
+              <div class="card-icon"><svg class="icon"><use href="#i-mail"/></svg></div>
+              <div><h4>Email</h4><p>hello@agriknowledgehub.example</p></div>
+            </div>
+
+            <div class="footer-mini">
+              <span>© 2026 Agri Knowledge Hub — Grow smarter, farm better.</span>
+              <div class="socials">
+                <a href="#" aria-label="Instagram"><svg class="icon"><use href="#i-insta"/></svg></a>
+                <a href="#" aria-label="Twitter"><svg class="icon"><use href="#i-twitter"/></svg></a>
+                <a href="#" aria-label="YouTube"><svg class="icon"><use href="#i-yt"/></svg></a>
+              </div>
+            </div>
+          </div>
+
+          <form class="form-box reveal" style="--i:3" onsubmit="return false;">
+            <div class="field"><label for="fname">Name</label><input id="fname" type="text" placeholder="Your full name"></div>
+            <div class="field"><label for="femail">Email</label><input id="femail" type="email" placeholder="you@example.com"></div>
+            <div class="field"><label for="fmsg">Message</label><textarea id="fmsg" placeholder="Tell us what you'd like to know…"></textarea></div>
+            <button class="btn btn-primary" type="submit" style="width:100%;justify-content:center;">Send Message <svg class="icon"><use href="#i-arrow-right"/></svg></button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.0.5/swiper-bundle.min.js"></script>
+<script>
+/* ============================================================
+   INITIALISE SWIPER — vertical, full-screen, mousewheel + keyboard,
+   with the built-in Parallax module driving each slide-bg layer.
+   ============================================================ */
+const swiper = new Swiper('.mySwiper', {
+  direction: 'vertical',
+  slidesPerView: 1,
+  speed: 850,
+  parallax: true,
+  mousewheel: { forceToAxis: true },
+  keyboard: { enabled: true },
+  effect: 'slide',
+  on: {
+    slideChangeTransitionStart(){ replayReveals(); },
+    slideChange(){ syncNav(this.activeIndex); }
+  }
+});
+
+const slideNames = ['Home','Crops','Soil','Irrigation','Fertilizers','Pest Control','Schemes','Contact'];
+
+/* Re-trigger the .reveal card animations every time a slide becomes active */
+function replayReveals(){
+  const active = document.querySelector('.swiper-slide-active');
+  if(!active) return;
+  active.querySelectorAll('.reveal').forEach(el=>{
+    el.style.animation = 'none';
+    // force reflow so the animation can restart
+    void el.offsetWidth;
+    el.style.animation = '';
+  });
+}
+
+/* Keep top nav + growth-stage rail in sync with the active slide */
+function syncNav(index){
+  document.querySelectorAll('.nav-links button[data-goto]').forEach(b=>{
+    b.classList.toggle('active', Number(b.dataset.goto) === index);
+  });
+  document.querySelectorAll('.growth-dot').forEach(b=>{
+    b.classList.toggle('active', Number(b.dataset.goto) === index);
+  });
+}
+syncNav(0);
+replayReveals();
+
+/* Any element with data-goto="N" navigates the swiper to slide N */
+document.querySelectorAll('[data-goto]').forEach(el=>{
+  el.addEventListener('click', (e)=>{
+    e.preventDefault();
+    swiper.slideTo(Number(el.dataset.goto));
+    document.getElementById('navLinks').classList.remove('open');
+  });
+});
+
+/* ---------- Navbar background on scroll-state (slide index) ---------- */
+const navbar = document.getElementById('navbar');
+swiper.on('slideChange', function(){
+  navbar.classList.toggle('scrolled', this.activeIndex > 0);
+});
+
+/* ---------- Mobile hamburger menu ---------- */
+const hamburger = document.getElementById('hamburger');
+const navLinks = document.getElementById('navLinks');
+hamburger.addEventListener('click', ()=> navLinks.classList.toggle('open'));
+
+/* ---------- Dark / light mode toggle, remembered in-session ---------- */
+const themeToggle = document.getElementById('themeToggle');
+const themeIcon = document.getElementById('themeIcon');
+let isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+applyTheme();
+themeToggle.addEventListener('click', ()=>{
+  isDark = !isDark;
+  applyTheme();
+});
+function applyTheme(){
+  document.documentElement.classList.toggle('dark', isDark);
+  themeIcon.innerHTML = `<use href="#${isDark ? 'i-sun-toggle' : 'i-moon'}"/>`;
+}
+</script>
+</body>
+</html>
